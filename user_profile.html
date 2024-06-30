@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header {
+            /* color: white; */
+            /* background-color: #333; */
+            padding: 10px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo img {
+            height: 100px;
+        }
+
+        .navbar {
+            list-style-type: none;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar li {
+            margin-right: 100px;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: black;
+        }
+        .navbar li a:hover{
+            text-decoration: underline;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .profile-section {
+            background-color: #fff;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .profile-section h2 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .account-settings {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            flex-direction: column;
+            /* max-width: 500px; */
+        }
+
+        .profile-details, .account-settings {
+            margin-bottom: 20px;
+        }
+
+        .profile-details div, .account-settings div {
+            margin-bottom: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px auto;
+            font-size: 16px;
+            color: black;
+            background-color: #dadcde;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            min-width: 550px;
+        }
+
+        .button.delete:hover {
+            background-color: #dc3545;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        #message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .the-info {
+            margin: 20px 150px;
+            font-size: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header::after {
+            content: '';
+            flex-grow: 1;
+            margin-left: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        /* Hamburger menu styling */
+        .hamburger-menu {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+            color: black;
+        }
+
+        .hamburger-menu .bar {
+            width: 25px;
+            height: 3px;
+            background-color: black;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        /* Rotate first and third bar for X symbol */
+        .change .bar:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .change .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .change .bar:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        @media screen and (max-width: 768px) {
+            .navbar {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                width: 100px;
+                text-align: center;
+                margin-top: 20px;
+            }
+            .navbar.show {
+                display: flex;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+            .the-info {
+                margin: 20px;
+                font-size: 1.2rem;
+            }
+
+            .button {
+                width: 100%;
+                text-align: center;
+                min-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="evpoint_logo.png" alt="Logo">
+            </div>
+            <div class="hamburger-menu" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="navbar" id="navbar">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="user_profile.html">Profile</a></li>
+                <li><a href="logout.html">Logout</a></li>
+            </ul>
+        </nav>        
+    </header>
+    <div class="container">
+        <div class="profile-section">
+            <h1 class="section-header">Profile</h1>
+            <div class="profile-details">
+                <div class="section-header">
+                    <h3>Details</h3>
+                </div>
+                <center><img style="border-radius: 50%; width: 150px;" src="user_animal.jpg" alt=""></center>
+                <div class="the-info">
+                    <div style="display: grid; grid-template-columns: 1fr 2fr;"><strong>Name:</strong> <span id="user-name"></span></div>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr;"><strong>Email:</strong> <span id="user-email"></span></div>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr;"><strong>Phone Number:</strong> <span id="user-phone" style="margin-top: 10px;"></span></div>
+                </div>
+            </div>
+            <div class="account-settings">
+                <div class="section-header">
+                    <h3>Settings</h3>
+                </div>
+                <center>
+                    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; width: 100%;">
+                        <button class="button" onclick="changepassword()">Change Password</button>
+                        <button class="button" onclick="signOut()">Sign Out</button>
+                        <button class="button delete" onclick="deleteAccount()">Delete Account</button>
+                    </div>
+                </center>
+                <div id="message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            authDomain: "evpoint-a86f2.firebaseapp.com",
+            databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to authenticate the user
+        async function authenticateUser() {
+            return new Promise((resolve, reject) => {
+                firebase.auth().onAuthStateChanged(async user => {
+                    if (user) {
+                        const userId = user.uid;
+                        const userRef = database.ref('users/' + userId);
+
+                        try {
+                            const snapshot = await userRef.once('value');
+                            const data = snapshot.val();
+                            const userName = data.name || 'User';
+                            const userEmail = user.email;
+                            const userPhone = data.phone || 'Not provided';
+
+                            // Update the DOM to show the user's details
+                            document.getElementById('user-name').textContent = userName;
+                            document.getElementById('user-email').textContent = userEmail;
+                            document.getElementById('user-phone').textContent = userPhone;
+
+                            resolve(user);
+                        } catch (error) {
+                            console.log(error);
+                            reject(error);
+                        }
+                    } else {
+                        window.location.href = 'user_signup.html'; // Redirect to signup page
+                    }
+                });
+            });
+        }
+
+        // Function to sign out the user
+        function signOut() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'user_signup.html'; // Redirect to signup page after sign out
+            }).catch((error) => {
+                console.log('Sign Out Error', error);
+            });
+        }
+
+        // Function to delete the user's account
+        function deleteAccount() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const userId = user.uid;
+                user.delete().then(() => {
+                    database.ref('users/' + userId).remove().then(() => {
+                        window.location.href = 'user_signup.html'; // Redirect to signup page after account deletion
+                    }).catch((error) => {
+                        console.log('Error removing user data from database', error);
+                        document.getElementById('message').textContent = 'Error removing user data from database';
+                    });
+                }).catch((error) => {
+                    console.log('Delete Account Error', error);
+                    document.getElementById('message').textContent = 'Delete Account Error: ' + error.message;
+                });
+            }
+        }
+
+        // Authenticate user on page load
+        window.onload = function() {
+            authenticateUser().then(user => {
+                console.log('Authenticated user:', user);
+            }).catch(error => {
+                console.error('Error during authentication:', error);
+            });
+        };
+        // Function to toggle menu visibility
+        function toggleMenu() {
+            var navbar = document.getElementById("navbar");
+            navbar.classList.toggle("show");
+
+            var hamburger = document.querySelector(".hamburger-menu");
+            hamburger.classList.toggle("change");
+        }
+        function changepassword(){
+            window.location.href = 'user_change_password.html';
+        }
+    </script>
+</body>
+</html>

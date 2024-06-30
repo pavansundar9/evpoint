@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Vehicle Charging Stations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            padding: 5px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo img {
+            height: 80px; /* Adjusted for better responsiveness */
+        }
+
+        .navbar {
+            list-style-type: none;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 0; /* Removing default margin */
+        }
+
+        .navbar li {
+            margin-right: 100px;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: black;
+            padding: 10px;
+        }
+        .navbar li a:hover{
+            background-color: #8edf63;
+            border-radius: 20px;
+            border: 1px solid transparent;
+        }
+        .main {
+            display: flex;
+        }
+
+        .ev-details {
+            width: 100%; /* Full width on smaller screens */
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: #f0f8ff; /* Alice blue */
+        }
+
+        .ev-info {
+            border-bottom: 1px solid #333;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .ev-info:hover {
+            height: auto;
+        }
+
+        .ev-map {
+            width: 100%; /* Full width on smaller screens */
+            padding: 10px;
+            height: 400px; /* Set a fixed height */
+            border-radius: 10px;
+        }
+
+        #user-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            border: 1px solid #929393;
+            padding: 5px;
+            background-color: #d4e6d1; /* Light green */
+            margin-right: 10px;
+        }
+
+        /* Media queries for responsiveness */
+        @media (min-width: 768px) {
+            .ev-details {
+                width: 30%;
+            }
+
+            .ev-map {
+                width: 70%;
+                height: 600px; /* Increased height for larger screens */
+            }
+        }
+
+        @media (max-width: 767px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .navbar li {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            header {
+                padding: 10px;
+            }
+
+            .logo img {
+                height: 60px;
+            }
+
+            .ev-map {
+                height: 300px; /* Reduced height for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="evpoint_logo.png" alt="Logo">
+            </div>
+            <ul class="navbar">
+                <li><a href="#">Home</a></li>
+                <li><a href="user_profile.html">Profile</a></li>
+                <li><a href="logout.html">Logout</a></li>
+                <li id="user-name"></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="main">
+        <section class="ev-details">
+            <!-- Data loaded dynamically via JavaScript -->
+        </section>
+        <section class="ev-map">
+            <!-- Google Map with markers, loaded via JavaScript -->
+            <div id="map" style="height: 100%; border-radius: 10px;"></div>
+        </section>
+    </main>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6yIQr2JGOVXaDifaI_cE96odWcoNXsPA&libraries=geometry,places"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+             authDomain: "evpoint-a86f2.firebaseapp.com",
+            databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let userId = null;
+        let map; // Define map globally
+
+        // Initialize Google Maps
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 0, lng: 0 },
+                zoom: 16,
+            });
+            return map; // Return map object
+        }
+
+        // Function to authenticate the user
+        async function authenticateUser() {
+            return new Promise((resolve, reject) => {
+                firebase.auth().onAuthStateChanged(async user => {
+                    if (user) {
+                        const userId = user.uid;
+                        const userRef = database.ref('users/' + userId);
+
+                        try {
+                            const snapshot = await userRef.once('value');
+                            const data = snapshot.val();
+                            const userName = data.name || 'User'; // Use 'User' as a default value if name is not present
+
+                            // Update the DOM to show the user's name
+                            const userNameElement = document.getElementById('user-name');
+                            userNameElement.textContent = `Hello, ${userName}`;
+
+                            resolve(user);
+                        } catch (error) {
+                            console.log(error);
+                            reject(error);
+                        }
+                    } else {
+                        window.location.href = 'user_signup.html'; // Redirect to signup page
+                    }
+                });
+            });
+        }
+
+
+        // Function to fetch EVCS details from Firebase and display on map
+        function fetchEvcsDetails(userLocation) {
+            const evcsRef = firebase.database().ref('evcs');
+            evcsRef.once('value')
+                .then(snapshot => {
+                    const evcs = snapshot.val();
+                    const promises = Object.values(evcs).map(evc => {
+                        return new Promise((resolve, reject) => {
+                            const address = evc.address;
+                            const geocoder = new google.maps.Geocoder();
+                            geocoder.geocode({ address: address }, (results, status) => {
+                                if (status === google.maps.GeocoderStatus.OK) {
+                                    const evcLocation = results[0].geometry.location;
+                                    evc.lat = evcLocation.lat();
+                                    evc.lng = evcLocation.lng();
+
+                                    // Calculate the distance from the user's location
+                                    const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                                        new google.maps.LatLng(userLocation.lat, userLocation.lng),
+                                        evcLocation
+                                    );
+                                    evc.distance = distance;
+
+                                    resolve(evc);
+                                } else {
+                                    reject(`Geocode was not successful for the following reason: ${status}`);
+                                }
+                            });
+                        });
+                    });
+
+                    Promise.all(promises)
+                        .then(evcsWithLocations => {
+                            // Sort EVCS by distance (closest first)
+                            evcsWithLocations.sort((a, b) => a.distance - b.distance);
+
+                            evcsWithLocations.forEach(evc => {
+                                // Call showPinOnMap to display markers on the map
+                                showPinOnMap(evc.address, evc.name);
+                                
+                                // Display EV details in the ev-details section
+                                const evDetailsSection = document.querySelector('.ev-details');
+                                const evcElement = document.createElement('div');
+                                evcElement.innerHTML = `<div class='ev-info'>
+                                    <div style='display: flex; flex-direction: column;'>
+                                        <h3>${evc.name}</h3>
+                                        <p style='font-style: italic; color: #929393; margin-top: -18px;'>${evc.email}</p>
+                                    </div>
+                                    <p style = 'margin-top: -8px;'><b>Contact:</b> ${evc.phone}</p>
+                                    <p style = 'margin-top: -8px;'><b>Address:</b> ${evc.address}</p>
+                                    <div style = 'display: flex; justify-content: space-between;'>
+                                        <p>Total Slots: <i style='border: 1px solid black;'>${evc.totalSlots}</i></p>
+                                        <p>Available Slots: <i style='border: 1px solid black;'>${evc.slotsAvailable}</i></p>
+                                        <p>Distance: <i style='border: 1px solid black; '>${(evc.distance / 1000).toFixed(2)} km</i></p>
+                                    </div>
+                                </div>`;
+                                evDetailsSection.appendChild(evcElement);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching and displaying EVCS:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching EVCS details:', error);
+                });
+        }
+
+
+        // Function to show pin on the map for a given address and name
+        async function showPinOnMap(address, name, isUserLocation = false) {
+            const apiKey = 'AIzaSyB6yIQr2JGOVXaDifaI_cE96odWcoNXsPA';
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+            try {
+                const response = await fetch(geocodeUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results.length > 0) {
+                        const { lat, lng } = data.results[0].geometry.location;
+
+                        // Determine the icon based on user or EVCS
+                        const iconUrl = isUserLocation ? 'user_loc.png' : 'ev_loc.png';
+
+                        const marker = new google.maps.Marker({
+                            position: { lat, lng },
+                            map: map, // Assuming 'map' is a globally accessible variable
+                            title: name,
+                            icon: {
+                                url: iconUrl,
+                                scaledSize: new google.maps.Size(40, 40) // Adjust size as needed
+                            }
+                        });
+
+                        // Open info window on marker click
+                        const infowindow = new google.maps.InfoWindow({
+                            content: `<b>${name}</b><br><p>${address}</p>`
+                        });
+                        marker.addListener('click', function() {
+                            infowindow.open(map, marker);
+                        });
+                    } else {
+                        console.error('No results found for the address.');
+                    }
+                } else {
+                    console.error('Error fetching geocode data:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching geocode data:', error);
+            }
+        }
+
+        // Request permission for location access
+        function getLocationAndFetchEVCS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    // Center map on user's location
+                    map.setCenter(userLocation);
+                    showPinOnMap(`${userLocation.lat},${userLocation.lng}`, 'User', true);
+                    // Fetch EVCS details based on user's location
+                    fetchEvcsDetails(userLocation);
+                }, error => {
+                    console.error('Error getting user location:', error);
+                });
+            } else {
+                alert('Geolocation access is denaied or Geolocation is not supported by this browser.');
+                console.error('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Initialize map and fetch EVCS details when the page loads
+        window.onload = function() {
+            initMap();
+            authenticateUser()
+                .then(user => {
+                    console.log('Authenticated user:', user);
+                    getLocationAndFetchEVCS();
+                })
+                .catch(error => {
+                    console.error('Error during authentication:', error);
+                });
+        };
+    </script>
+</body>
+</html>

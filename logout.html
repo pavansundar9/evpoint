@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Admin - Logout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            authDomain: "evpoint-a86f2.firebaseapp.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Logout function
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                // Redirect to login page
+                window.location.href = 'ev_signup.html';
+            }).catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        }
+
+        // Call logout function when the page loads
+        window.addEventListener('load', () => {
+            logout();
+        });
+    </script>
+
+    <div class="body">
+        <div class="logout-container">
+            <h1>Logging out...</h1>
+            <p>Please wait while we log you out.</p>
+        </div>
+    </div>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .logout-container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        p {
+            margin: 10px 0 0;
+            color: #666;
+        }
+    </style>
+</body>
+</html>

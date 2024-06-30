@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Admin - Slots Management</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <div class="body">
+        <div class="dashboard-container">
+            <nav class="dash-nav">
+                <ul>
+                    <div class="logo"><img src="evpoint_logo.png" alt="evpoint_logo"></div>
+                    <li><a href="ev_dashboard.html">Dashboard</a></li>
+                    <li class="active slots"><a href="">Slots Management</a>
+                        <div class="slot_manage">
+                            <ul>
+                                <li><a href="ev_slots_manage.html">Manage Available Slots</a></li>
+                                <li><a href="ev_total_slots_manage.html">Manage Total Slots</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a href="ev_account_mange.html">Account Management</a></li>
+                </ul>
+            </nav>
+            <main>
+                <section class="dashboard-section">
+                    <h1>Slots Management</h1>
+                    <form>
+                        <label for="available-slots">Available Slots at the moment: </label><br>
+                        <input type="number" id="available-slots"><br>
+                        <button id="update-new" title="submit-new">Update</button>
+                        <button id="cancel" title="cancel">Cancel</button>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            authDomain: "evpoint-a86f2.firebaseapp.com",
+            databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let userId = null;
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                userId = user.uid;
+                await fetchData(userId);
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function fetchData(userId) {
+            const evcRef = database.ref('evcs/' + userId);
+            try {
+                const snapshot = await evcRef.once('value');
+                const data = snapshot.val();
+                document.getElementById('available-slots').value = data.slotsAvailable;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function updateData() {
+            const newSlots = document.getElementById('available-slots').value;
+            const evcRef = database.ref('evcs/' + userId);
+            try {
+                await evcRef.update({ slotsAvailable: newSlots });
+                window.location.href = 'ev_dashboard.html';
+            } catch (error) {
+                console.error('Error updating data:', error);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('update-new').addEventListener('click', (e) => {
+                e.preventDefault();
+                updateData();
+            });
+
+            document.getElementById('cancel').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'ev_dashboard.html';
+            });
+        });
+    </script>
+</body>
+</html>

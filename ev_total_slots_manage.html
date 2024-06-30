@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Admin- Dashboard</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <div class="body">
+        <div class="dashboard-container">
+            <nav class="dash-nav">
+                <div class="logo"><img src="evpoint_logo.png" alt="evpoint_logo"></div>
+                <div>
+                    <div class="hamburger" id="hamburger">&#9776;</div>
+                    <ul id="nav-menu" class="small-nav">
+                        <li><a href="ev_dashboard.html">Dashboard</a></li>
+                        <li class="slots active"><a href="#">Slots Management</a>
+                            <div class="slot_manage">
+                                <ul>
+                                    <li><a href="ev_slots_manage.html">Manage Available Slots</a></li>
+                                    <li><a href="">Manage Total Slots</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li><a href="#">Account Management</a></li>
+                        <li class="logout"><a href="logout.html">Logout</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <main>
+                <section class="dashboard-section">
+                    <h1>Total Slots Management</h1>
+                    <form>
+                        <label for="total-slots">Total Slots: </label><br>
+                        <input type="number" id="total-slots"><br>
+                        <button id="update-total" title="submit-total">Update</button>
+                        <button id="cancel" title="cancel">Cancel</button>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            authDomain: "evpoint-a86f2.firebaseapp.com",
+            databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let userId = null;
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                userId = user.uid;
+                await fetchData(userId);
+            } else {
+                window.location.href = 'ev_signup.html';
+            }
+        });
+
+        async function fetchData(userId) {
+            const evcRef = database.ref('evcs/' + userId);
+            try {
+                const snapshot = await evcRef.once('value');
+                const data = snapshot.val();
+                document.getElementById('total-slots').value = data.totalSlots;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function updateData() {
+            const newTotalSlots = document.getElementById('total-slots').value;
+            const evcRef = database.ref('evcs/' + userId);
+            try {
+                await evcRef.update({ totalSlots: newTotalSlots });
+                window.location.href = 'ev_dashboard.html';
+            } catch (error) {
+                console.error('Error updating data:', error);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('update-total').addEventListener('click', (e) => {
+                e.preventDefault();
+                updateData();
+            });
+
+            document.getElementById('cancel').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'ev_dashboard.html';
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+
+            hamburger.addEventListener('click', function () {
+                if (navMenu.classList.contains('show')) {
+                    navMenu.classList.remove('show');
+                } else {
+                    navMenu.classList.add('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

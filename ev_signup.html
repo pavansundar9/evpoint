@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            height: 90vh;
+            width: 100%;
+        }
+        .container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            width: 550px;
+            border-radius: 10px;
+        }
+        .auth-container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            height: auto;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .input-wrapper {
+            position: relative;
+            margin-top: 30px;
+            width: 92%;
+        }
+        .input {
+            font-size: 16px;
+            padding: 10px 10px 10px 10px;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: transparent;
+            width: 100%;
+            transition: border-color 250ms;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .input::placeholder {
+            color: transparent;
+        }
+        .label {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            color: #777;
+            pointer-events: none;
+            transform-origin: left center;
+            transition: transform 250ms, color 250ms;
+            background-color: white;
+            padding: 0 5px;
+            border-radius: 3px;
+        }
+        .input:focus + .label,
+        .input:not(:placeholder-shown) + .label {
+            transform: translateY(-110%) scale(0.85);
+            color: #555;
+        }
+        button[type="submit"], button[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 250ms;
+        }
+        button[type="submit"]:hover, button[type="button"]:hover {
+            background-color: #45a049;
+        }
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 12px;
+            position: relative;
+        }
+        .step {
+            text-align: center;
+            padding: 10px 15px;
+            border: 1px solid black;
+            border-radius: 50%;
+            background-color: #ddd;
+            z-index: 1;
+        }
+        .steps::before {
+            content: "";
+            position: absolute;
+            top: 15%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            width: 100%;
+            background-color: black;
+            z-index: 0;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        #confirm_det_div {
+            overflow-y: scroll;
+            height: 85vh;
+            width: 90%;
+        }
+        #confirm_det_div::-webkit-scrollbar { /* Hide scrollbar for Chrome, Safari, and Opera */
+            display: none;
+        }
+        .centered {
+            grid-template-columns: 1fr !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .big-logo {
+            display: block;
+        }
+        .message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+        #small_logo{
+            display: none;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        @media screen and (max-width: 1024px) {
+            .container {
+                /* grid-template-columns: 1fr; */
+                overflow-y: auto;
+                height: auto;
+            }
+            .auth-container {
+                width: 100%;
+                max-width: 90%;
+            }
+        }
+        @media screen and (max-width: 768px) {
+            #small_logo{
+                display: block;
+                margin-bottom: -40px;
+            }
+            .container{
+                grid-template-columns: 1fr;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column-reverse;
+                margin-top: 100px;
+            }
+            #big-logo{
+                display: none;
+            }
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        @media screen and (max-width: 480px){
+            #small_logo{
+                display: block;
+            }
+            #big-logo{
+                display: none;
+            }
+            .steps {
+                flex-direction: column;
+                align-items: center;
+            }
+            .step {
+                margin-bottom: 10px;
+            }
+            .steps::before {
+                height: auto;
+                width: 1px;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            authDomain: "evpoint-a86f2.firebaseapp.com",
+            databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
+            projectId: "evpoint-a86f2",
+            storageBucket: "evpoint-a86f2.appspot.com",
+            messagingSenderId: "1016890687077",
+            appId: "1:1016890687077:web:9cda77a50ce0c29068908c",
+            measurementId: "G-BRF0GMB7VC"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Function to handle login
+        const handleLogin = async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('login_email').value;
+            const password = document.getElementById('login_password').value;
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log('User logged in:', userCredential.user);
+                alert('Login successful!');
+                window.location.href = 'ev_dashboard.html';
+            } catch (error) {
+                // console.error('Error during login:', error);
+                // alert('Login failed: ' + error.message);
+                var errorMessage;
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'Email does not exist.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Email and password combination do not match.';
+                } else {
+                    errorMessage = 'An unknown error occurred. Please try again.';
+                }
+                document.getElementById('login-error-message').innerText = errorMessage;
+            }
+        };
+
+        const toggleForms = () => {
+            const signupForm = document.getElementById('basic_info_div');
+            const loginForm = document.getElementById('login_form');
+            if (signupForm.style.display === 'none') {
+                signupForm.style.display = 'block';
+                loginForm.style.display = 'none';
+            } else {
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            }
+        };
+    </script>
+    <div class="container" id="container">
+        <div id="basic_info_div" class="auth-container">
+            <form action="" method="post" class="auth-form" id="basic-form">
+                <h2>Signup</h2>
+                <div class="error-message" id="basic-error-message"></div>
+                <div class="input-wrapper">
+                    <input type="text" title="name" name="name" id="name" class="input" placeholder="" required>
+                    <label class="label">Name of the EV station <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="email" title="Email" name="email" id="signup_email" class="input" placeholder="" required>
+                    <label class="label">Email <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" title="Phone Number" name="phone" id="signup_phone" class="input" placeholder="" required>
+                    <label class="label">Contact Number <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" title="Password" name="password" id="signup_password" class="input" placeholder="" required>
+                    <label class="label">Password <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" title="Confirm Password" name="con-password" id="signup_con_password" class="input" placeholder="" required>
+                    <label class="label">Confirm Password <span>*</span></label>
+                </div>
+                <button style="width: 50%; margin-right: 25px;" type="button" onclick="basicToLoc()">Next</button>
+                <div class="message">
+                    <p>Already registered? <a href="#" onclick="toggleForms()">Login</a></p> &nbsp;(or)&nbsp;
+                    <p>Are you an user? <a href="user_signup.html">User Signup</a></p>
+                </div>
+            </form>
+        </div>
+        <div id="location_det_div" class="auth-container loc_details_div" style="display: none;">
+            <h2>Location Details</h2>
+            <div class="steps">
+                <div style="text-align: center;">
+                    <span class="step one">1</span>
+                    <p>Basic Info</p>
+                </div>
+                <div style="text-align: center;">
+                    <span class="step two">2</span>
+                    <p>Location Details</p>
+                </div>
+                <div style="text-align: center;">
+                    <span class="step three">3</span>
+                    <p>Confirm Details</p>
+                </div>
+            </div>
+            
+            <div class="error-message" id="location-error-message"></div>
+            
+            <form id="location-form">
+                <div class="input-wrapper">
+                    <input type="text" title="Address" name="address" id="address" class="input" placeholder="" required>
+                    <label class="label">Address <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" title="Total Slots" name="total-slots" id="total-slots" class="input" placeholder="" required>
+                    <label class="label">Total no of slots available <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" title="Slots Available" name="slots-ave" id="slots-ave" class="input" placeholder="" required>
+                    <label class="label">No of open slots right now <span>*</span></label>
+                </div>
+                <div class="buttons">
+                    <button type="button" onclick="locToConfirm()">Next</button>
+                    <button type="button" onclick="locToBasic()">Previous</button>
+                </div>
+            </form>
+        </div>
+        <div id="confirm_det_div" class="auth-container" style="display: none;">
+            <h2>Confirm Details</h2>
+            <div class="steps">
+                <div style="text-align: center;">
+                    <span class="step one">1</span>
+                    <p>Basic Info</p>
+                </div>
+                <div style="text-align: center;">
+                    <span class="step two">2</span>
+                    <p>Location Details</p>
+                </div>
+                <div style="text-align: center;">
+                    <span class="step three">3</span>
+                    <p>Confirm Details</p>
+                </div>
+            </div>
+            
+            <div class="error-message" id="confirm-error-message"></div>
+            <form id="confirm-form">
+                <div class="input-wrapper">
+                    <input type="text" id="confirm-name" class="input" disabled>
+                    <label for="confirm-name" class="label">Name:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="email" id="confirm-email" class="input" disabled>
+                    <label for="confirm-email" class="label">Email:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" id="confirm-password" class="input" disabled>
+                    <label for="confirm-password" class="label">Password:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="confirm-phone" class="input" disabled>
+                    <label for="confirm-phone" class="label">Contact Number:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="confirm-address" class="input" disabled>
+                    <label for="confirm-address" class="label">Address:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" id="confirm-total-slots" class="input" disabled>
+                    <label for="confirm-total-slots" class="label">Total Slots:</label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" id="confirm-slots-available" class="input" disabled>
+                    <label for="confirm-slots-available" class="label">Slots Available:</label>
+                </div>
+                <div class="buttons">
+                    <button type="button" onclick="confirmToLoc()">Previous</button>
+                    <button type="button" id="confirm-submit" onclick="addUser()">Confirm</button>
+                </div>
+            </form>
+        </div>
+        <div class="auth-container" id="login_form" style="display: none;">
+            <form action="" method="post" class="auth-form" id="login-form" onsubmit="handleLogin(event)">
+                <h2>Login</h2>
+                <div class="input-wrapper">
+                    <input type="email" title="Email" name="login_email" id="login_email" class="input" placeholder="" required>
+                    <label class="label">Email <span>*</span></label>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" title="Password" name="login_password" id="login_password" class="input" placeholder="" required>
+                    <label class="label">Password <span>*</span></label>
+                </div>
+                <div class="buttons">
+                    <button style="width: 100%;" type="submit">Login</button>
+                </div>
+                <div class="message">
+                    <p>Don't have an account? <a href="#" onclick="toggleForms()">Sign Up</a></p>
+                    <p>Are you an User? <a href="user_signup.html">User Login</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="big-logo">
+            <img src="evpoint_logo.png" id="small_logo" alt="small-screen-img" />
+            <img src="ev3.png" id="big-logo" alt="Logo AgileAlly" />
+        </div>
+    </div>
+    
+    <script>
+        const basicDiv = document.getElementById('basic_info_div');
+        const locationDiv = document.getElementById('location_det_div');
+        const confirmDiv = document.getElementById('confirm_det_div');
+        const container = document.getElementById('container');
+
+        function basicToLoc() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('signup_email').value;
+            const phone = document.getElementById('signup_phone').value;
+            const password = document.getElementById('signup_password').value;
+            const con_password = document.getElementById('signup_con_password').value;
+
+            const basic_error_msg = document.getElementById('basic-error-message');
+
+            if (name === '' || email === '' || phone === '' || password === '' || con_password === '') {
+                // alert('Please enter all the fields');
+                basic_error_msg.innerHTML = 'Please enter all the fields';
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                // alert('Please enter a valid email address');
+                basic_error_msg.innerHTML = 'Please enter a valid email address';
+                return;
+            }
+            const re = /^\d{10}$/;
+            if(!re.test(phone)){
+                // alert('Please enter a valid phone number');
+                basic_error_msg.innerHTML = 'Please enter a valid phone number';
+                return;
+            }
+            if (password !== con_password) {
+                // alert('Passwords do not match!');
+                basic_error_msg.innerHTML = 'Passwords do not match!';
+                return;
+            }
+
+            basicDiv.style.display = 'none';
+            locationDiv.style.display = 'block';
+            container.classList.add('centered');
+            document.querySelector('.big-logo').style.display = 'none';
+        }
+
+        function locToConfirm() {
+            const address = document.getElementById('address').value;
+            const totalSlots = document.getElementById('total-slots').value;
+            const slotsAvailable = document.getElementById('slots-ave').value;
+
+            const location_Error = document.getElementById('location-error-message');
+
+            if (address === '' || totalSlots === '' || slotsAvailable === '') {
+                // alert('Please enter all the fields');
+                location_Error.innerHTML = 'Please enter all the fields';
+                return;
+            }
+
+            if (totalSlots < 0) {
+                // alert('Total slots should be a positive number');
+                location_Error.innerHTML = 'Total slots should be a positive number';
+                return;
+            }
+
+            if (parseInt(slotsAvailable) >parseInt(totalSlots)) {
+                // alert('Available slots should be less than or equal to total slots');
+                location_Error.innerHTML = 'Available slots should be less than or equal to total slots';
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('signup_email').value;
+            const phone = document.getElementById('signup_phone').value;
+            const password = document.getElementById('signup_password').value;
+
+            document.getElementById('confirm-name').value = name;
+            document.getElementById('confirm-email').value = email;
+            document.getElementById('confirm-phone').value = phone;
+            document.getElementById('confirm-password').value = password;
+            document.getElementById('confirm-address').value = address;
+            document.getElementById('confirm-total-slots').value = totalSlots;
+            document.getElementById('confirm-slots-available').value = slotsAvailable;
+
+            locationDiv.style.display = 'none';
+            confirmDiv.style.display = 'block';
+        }
+
+        function locToBasic() {
+            locationDiv.style.display = 'none';
+            basicDiv.style.display = 'block';
+            container.classList.remove('centered');
+            document.querySelector('.big-logo').style.display = 'block';
+        }
+
+        function confirmToLoc() {
+            confirmDiv.style.display = 'none';
+            locationDiv.style.display = 'block';
+        }
+
+        function addUser() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('signup_email').value;
+            const phone = document.getElementById('signup_phone').value;
+            const password = document.getElementById('signup_password').value;
+            const address = document.getElementById('address').value;
+            const totalSlots = document.getElementById('total-slots').value;
+            const slotsAvailable = document.getElementById('slots-ave').value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    return database.ref('evcs/' + user.uid).set({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        address: address,
+                        totalSlots: totalSlots,
+                        slotsAvailable: slotsAvailable
+                    });
+                })
+                .then(() => {
+                    alert('Signup successful!');
+                    window.location.href = 'ev_dashboard.html';
+                })
+                .catch(error => {
+                    const errorCode = error.code;
+                    // const errorMessage = error.message;
+                    // alert('Error: ' + errorMessage);
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'Email is already in use.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak.';
+                    } else {
+                        errorMessage = 'An unknown error occurred. Please try again.';
+                    }
+                    document.getElementById('signup-error-message').innerText = errorMessage;
+                });
+        }
+    </script>
+</body>
+</html>
