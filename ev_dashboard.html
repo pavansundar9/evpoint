@@ -6,7 +6,7 @@
     <title>EV Admin- Dashboard</title>
     <link rel="stylesheet" href="style1.css">
     <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6yIQr2JGOVXaDifaI_cE96odWcoNXsPA"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API"></script>
 </head>
 <body>
     <!-- Firebase App (the core Firebase SDK) -->
@@ -18,7 +18,7 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyB5e10tMSvgPZ4fsNeNsnf6fkpmCJNo5Qg",
+            apiKey: "YOUR_API",
             authDomain: "evpoint-a86f2.firebaseapp.com",
             databaseURL: "https://evpoint-a86f2-default-rtdb.firebaseio.com",
             projectId: "evpoint-a86f2",
@@ -59,7 +59,7 @@
         }
 
         async function showPinOnMap(address, name) {
-            const apiKey = 'AIzaSyB6yIQr2JGOVXaDifaI_cE96odWcoNXsPA';
+            const apiKey = 'YOUR_API';
             const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
             try {
                 const response = await fetch(geocodeUrl);
